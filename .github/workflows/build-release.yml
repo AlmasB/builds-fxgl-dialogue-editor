@@ -33,24 +33,25 @@ jobs:
         cd FXGL/fxgl-tools
         mvn compile
         mvn javafx:jlink
-    - name: Delete old release
+    - name: Delete prev auto release
       uses: ame-yu/action-delete-latest-release@v2
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%d-%m-%Y')"
+    - name: Delete prev auto tag
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: git push --quiet https://"$env:GH_TOKEN"@github.com/AlmasB/builds-fxgl-dialogue-editor.git --delete origin tag-auto
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: tag-${{ steps.date.outputs.date }}
-        release_name: release-${{ steps.date.outputs.date }}
+        tag_name: tag-auto
+        release_name: release-auto
         body: This is the latest development build of FXGL Dialogue Editor. Latest stable build can be found in [FXGL releases](https://github.com/AlmasB/FXGL/releases).
         draft: false
-        prerelease: true
+        prerelease: false
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
